@@ -15,7 +15,7 @@ KERNEL_SIZE = 3
 
 def estimate_watermark(foldername):
     """
-    Given a folder, estimate the watermark (grad(W) = median(grad(J)))
+    Given a folder, estimate the watermark (grad(W) = median(grad(J))) follow Eq.4
     Also, give the list of gradients, so that further processing can be done on it
     """
     if not os.path.exists(foldername):
@@ -151,10 +151,13 @@ def crop_watermark(gradx, grady, threshold=0.4, boundary_size=2):
     @param: boundary_size - boundary around cropped image
     """
     W_mod = np.sqrt(np.square(gradx) + np.square(grady))
+    # Map image values to [0, 1]
     W_mod = PlotImage(W_mod)
+    # Threshold the image with threshold=0.4
     W_gray = image_threshold(np.average(W_mod, axis=2), threshold=threshold)
     x, y = np.where(W_gray == 1)
 
+    # Boundary of cropped image (contain watermark)
     xm, xM = np.min(x) - boundary_size - 1, np.max(x) + boundary_size + 1
     ym, yM = np.min(y) - boundary_size - 1, np.max(y) + boundary_size + 1
 
